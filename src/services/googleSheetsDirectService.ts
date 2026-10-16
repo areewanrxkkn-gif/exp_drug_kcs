@@ -25,6 +25,82 @@ const HEADERS = [
 ];
 
 export const GoogleSheetsDirectService = {
+  /**
+   * Helper: Ensure sheet tab with `title` exists in the spreadsheet.
+   * If it doesn't exist, create it or rename default single Sheet1 to it.
+   */
+  async ensureSheetExists(sheetId: string, token: string, targetTitle: string): Promise<string> {
+    try {
+      const metaUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`;
+      const res = await fetch(metaUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) return targetTitle;
+
+      const data = await res.json();
+      const sheets = data.sheets || [];
+      const hasTarget = sheets.some((s: any) => s.properties?.title === targetTitle);
+
+      if (hasTarget) {
+        return targetTitle;
+      }
+
+      // If only 1 sheet and it's named Sheet1 or default, rename it
+      if (sheets.length === 1 && sheets[0].properties) {
+        const firstSheet = sheets[0].properties;
+        const renameUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`;
+        await fetch(renameUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            requests: [
+              {
+                updateSheetProperties: {
+                  properties: {
+                    sheetId: firstSheet.sheetId,
+                    title: targetTitle,
+                  },
+                  fields: 'title',
+                },
+              },
+            ],
+          }),
+        });
+        return targetTitle;
+      }
+
+      // Otherwise, add a new sheet with targetTitle
+      const addUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`;
+      await fetch(addUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requests: [
+            {
+              addSheet: {
+                properties: {
+                  title: targetTitle,
+                },
+              },
+            },
+          ],
+        }),
+      });
+
+      return targetTitle;
+    } catch (e) {
+      console.warn('ensureSheetExists notice:', e);
+      return targetTitle;
+    }
+  },
+
   async fetchDrugs(sheetId: string): Promise<{ success: boolean; items?: DrugItem[]; error?: string; needsAuth?: boolean }> {
     const token = await getAccessToken();
     if (!token) {
@@ -32,14 +108,34 @@ export const GoogleSheetsDirectService = {
     }
 
     try {
-      const range = encodeURIComponent('คลังยา!A2:S');
+      // Check sheet metadata first to find correct sheet name
+      const metaUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`;
+      const metaRes = await fetch(metaUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (metaRes.status === 401 || metaRes.status === 403) {
+        return { success: false, needsAuth: true, error: 'สิทธิ์การเข้าถึง Google Sheet หมดอายุ กรุณาเข้าสู่ระบบใหม่' };
+      }
+
+      let activeSheetName = 'คลังยา';
+      if (metaRes.ok) {
+        const metaData = await metaRes.json();
+        const sheets = metaData.sheets || [];
+        const found = sheets.find((s: any) => s.properties?.title === 'คลังยา');
+        if (!found && sheets.length > 0) {
+          activeSheetName = sheets[0].properties?.title || 'Sheet1';
+        }
+      }
+
+      const range = encodeURIComponent(`${activeSheetName}!A2:S`);
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}`;
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.status === 401 || res.status === 403) {
-        return { success: false, needsAuth: true, error: 'สิทธิ์การเข้าถึง Google Sheet หมดอายุ กรุณาเข้าสู่ระบบใหม่' };
+        return { success: false, needsAuth: true, error: 'สิทธิ์การเข้าถึง Google Sheet หมดอายุ กรุณาเชื่อมต่อใหม่' };
       }
 
       if (!res.ok) {
@@ -50,8 +146,13 @@ export const GoogleSheetsDirectService = {
       const data = await res.json();
       const rows: any[][] = data.values || [];
 
+      // If empty sheet
+      if (rows.length === 0) {
+        return { success: true, items: [] };
+      }
+
       const items: DrugItem[] = rows
-        .filter((r) => r && r[1] && String(r[1]).trim() !== '')
+        .filter((r) => r && r[1] && String(r[1]).trim() !== '' && String(r[1]).trim() !== 'ชื่อยา (Drug Name)')
         .map((r, idx) => ({
           id: String(r[0] || `KCS-${Date.now().toString().slice(-4)}-${idx + 1}`),
           name: String(r[1] || ''),
@@ -84,7 +185,7 @@ export const GoogleSheetsDirectService = {
     }
 
     try {
-      const sheetName = 'คลังยา';
+      const sheetName = await this.ensureSheetExists(sheetId, token, 'คลังยา');
       
       // 1. Build row values
       const rows = drugs.map((d) => {
@@ -164,7 +265,7 @@ export const GoogleSheetsDirectService = {
     if (!token) return { success: false };
 
     try {
-      const sheetName = 'ประวัติตัดยอด';
+      const sheetName = await this.ensureSheetExists(sheetId, token, 'ประวัติตัดยอด');
       const row = [
         record.id,
         record.drugId,

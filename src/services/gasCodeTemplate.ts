@@ -17,8 +17,8 @@ const CONFIG = {
   DRIVE_FOLDER_ID: "${cleanFolderId}",
   SHEET_NAME_DRUGS: "คลังยา",
   SHEET_NAME_LOGS: "ประวัติตัดยอด",
-  TELEGRAM_BOT_TOKEN: "8939804029:AAHbGhUHnaPyAjRG8bzLpGRagstrZXpi2UQ",
-  TELEGRAM_CHAT_ID: "-5583489864", // Telegram Group ID
+  TELEGRAM_BOT_TOKEN: "8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y",
+  TELEGRAM_CHAT_ID: "-1004292171419", // Telegram Group ID
 };
 
 // 19 คอลัมน์มาตรฐานคลังยา รพ.เขาชัยสน

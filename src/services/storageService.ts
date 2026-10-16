@@ -202,10 +202,10 @@ export const StorageService = {
 
   getTelegramConfig(): TelegramConfig {
     const defaultConfig: TelegramConfig = {
-      botToken: '8939804029:AAHbGhUHnaPyAjRG8bzLpGRagstrZXpi2UQ',
-      botId: '8739503406',
-      chatId: '-5583489864',
-      groupId: '-5583489864',
+      botToken: '8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y',
+      botId: '8803814277',
+      chatId: '-1004292171419',
+      groupId: '-1004292171419',
       enabled: true,
       notifyOnSave: true,
       notifyOnDispense: true,
@@ -217,7 +217,24 @@ export const StorageService = {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.TELEGRAM_CONFIG);
       if (data) {
-        return { ...defaultConfig, ...JSON.parse(data) };
+        const parsed = JSON.parse(data);
+        if (
+          parsed.groupId !== '-1004292171419' ||
+          parsed.chatId !== '-1004292171419' ||
+          parsed.botToken !== '8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y'
+        ) {
+          const updated = {
+            ...parsed,
+            botToken: '8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y',
+            botId: '8803814277',
+            groupId: '-1004292171419',
+            chatId: '-1004292171419',
+            notifyGroup: true,
+          };
+          this.saveTelegramConfig(updated);
+          return updated;
+        }
+        return { ...defaultConfig, ...parsed, groupId: '-1004292171419', chatId: '-1004292171419', botToken: '8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y' };
       }
     } catch (e) {}
     return defaultConfig;

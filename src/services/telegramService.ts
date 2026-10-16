@@ -1,19 +1,24 @@
 import { TelegramConfig, DrugItem, DispenseRecord } from '../types/inventory';
 import { getDrugStatus, formatThaiDate } from '../utils/drugUtils';
 
+export const TELEGRAM_BOT_TOKEN_DEFAULT = '8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y';
+export const TELEGRAM_GROUP_ID_DEFAULT = '-1004292171419';
+
 // Status tracker to avoid sending repeated messages for the exact same drug state
 const lastNotifiedStatusCache = new Map<string, string>();
 
 export const TelegramService = {
   async sendMessage(botToken: string, chatId: string, text: string): Promise<boolean> {
-    if (!botToken || !chatId || !text) return false;
+    const token = botToken || TELEGRAM_BOT_TOKEN_DEFAULT;
+    const target = chatId || TELEGRAM_GROUP_ID_DEFAULT;
+    if (!token || !target || !text) return false;
     try {
-      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      const url = `https://api.telegram.org/bot${token}/sendMessage`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id: chatId,
+          chat_id: target,
           text: text,
           parse_mode: 'HTML',
         }),
@@ -27,10 +32,11 @@ export const TelegramService = {
   },
 
   async testConnection(config: TelegramConfig): Promise<{ success: boolean; message: string }> {
-    if (!config.botToken) {
+    const token = config.botToken || TELEGRAM_BOT_TOKEN_DEFAULT;
+    const targetChat = config.groupId || TELEGRAM_GROUP_ID_DEFAULT;
+    if (!token) {
       return { success: false, message: 'กรุณาระบุ Telegram Bot Token' };
     }
-    const targetChat = config.groupId || config.chatId;
     if (!targetChat) {
       return { success: false, message: 'กรุณาระบุ Chat ID หรือ Group ID' };
     }
@@ -38,18 +44,18 @@ export const TelegramService = {
     const testMsg = `🏥 <b>ทดสอบการเชื่อมต่อ Telegram Bot</b>
 ระบบคลังยานอก โรงพยาบาลเขาชัยสน จ.พัทลุง
 ⏰ เวลา: ${new Date().toLocaleTimeString('th-TH')} น.
-✅ สถานะ: บอทเชื่อมต่อและสามารถส่งข้อความเข้ากลุ่มได้สมบูรณ์`;
+✅ สถานะ: บอทเชื่อมต่อและสามารถส่งข้อความเข้ากลุ่ม ${targetChat} ได้สมบูรณ์`;
 
-    const ok = await this.sendMessage(config.botToken, targetChat, testMsg);
+    const ok = await this.sendMessage(token, targetChat, testMsg);
     if (ok) {
-      return { success: true, message: `ส่งข้อความทดสอบเข้ากลุ่ม/แชท (${targetChat}) สำเร็จเรียบร้อย!` };
+      return { success: true, message: `ส่งข้อความทดสอบเข้ากลุ่ม (${targetChat}) สำเร็จเรียบร้อย!` };
     }
     return { success: false, message: `ส่งไม่สำเร็จ กรุณาตรวจสอบว่าบอทถูกดึงเข้ากลุ่มแล้ว หรือ Token/Chat ID ถูกต้องหรือไม่` };
   },
 
   async notifyDrugSaved(config: TelegramConfig, drug: DrugItem, isEdit: boolean): Promise<void> {
     if (!config.enabled || !config.notifyOnSave) return;
-    const targetChat = config.groupId || config.chatId;
+    const targetChat = config.groupId || TELEGRAM_GROUP_ID_DEFAULT;
     if (!targetChat) return;
 
     const actionText = isEdit ? '✏️ <b>แก้ไขข้อมูลยา</b>' : '➕ <b>เพิ่มรายการยาใหม่</b>';
@@ -67,7 +73,7 @@ export const TelegramService = {
 
   async notifyDrugDeleted(config: TelegramConfig, name: string, lot: string, count?: number): Promise<void> {
     if (!config.enabled) return;
-    const targetChat = config.groupId || config.chatId;
+    const targetChat = config.groupId || TELEGRAM_GROUP_ID_DEFAULT;
     if (!targetChat) return;
 
     let msg = '';
@@ -88,7 +94,7 @@ export const TelegramService = {
 
   async notifyDrugDispensed(config: TelegramConfig, record: DispenseRecord): Promise<void> {
     if (!config.enabled || !config.notifyOnDispense) return;
-    const targetChat = config.groupId || config.chatId;
+    const targetChat = config.groupId || TELEGRAM_GROUP_ID_DEFAULT;
     if (!targetChat) return;
 
     const msg = `📤 <b>บันทึกการตัดยอดจ่ายยา</b>
@@ -107,7 +113,7 @@ export const TelegramService = {
 
   async notifyImportSuccess(config: TelegramConfig, added: number, updated: number): Promise<void> {
     if (!config.enabled) return;
-    const targetChat = config.groupId || config.chatId;
+    const targetChat = config.groupId || TELEGRAM_GROUP_ID_DEFAULT;
     if (!targetChat) return;
 
     const msg = `📥 <b>นำเข้าข้อมูลคลังยาสำเร็จ</b>
@@ -122,7 +128,7 @@ export const TelegramService = {
 
   async checkAndNotifyStatusChangesAutomatically(config: TelegramConfig, drugs: DrugItem[]): Promise<void> {
     if (!config.enabled || !config.notifyOnStatusChange) return;
-    const targetChat = config.groupId || config.chatId;
+    const targetChat = config.groupId || TELEGRAM_GROUP_ID_DEFAULT;
     if (!targetChat) return;
 
     const changedAlerts: string[] = [];
@@ -171,7 +177,7 @@ ${changedAlerts.length > 8 ? `\n...และอีก ${changedAlerts.length - 8
   },
 
   async notifyInventoryStatusAlerts(config: TelegramConfig, drugs: DrugItem[]): Promise<{ sentCount: number }> {
-    const targetChat = config.groupId || config.chatId;
+    const targetChat = config.groupId || TELEGRAM_GROUP_ID_DEFAULT;
     if (!targetChat) return { sentCount: 0 };
 
     const urgentItems = drugs.filter((d) => {

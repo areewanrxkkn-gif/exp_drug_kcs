@@ -57,10 +57,10 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
   const [folderId, setFolderId] = useState(gasConfig.folderId || '');
   
   // Telegram state
-  const [botToken, setBotToken] = useState(telegramConfig.botToken || '8939804029:AAHbGhUHnaPyAjRG8bzLpGRagstrZXpi2UQ');
-  const [botId, setBotId] = useState(telegramConfig.botId || '8739503406');
-  const [chatId, setChatId] = useState(telegramConfig.chatId || '-5583489864');
-  const [groupId, setGroupId] = useState(telegramConfig.groupId || '-5583489864');
+  const [botToken, setBotToken] = useState(telegramConfig.botToken || '8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y');
+  const [botId, setBotId] = useState(telegramConfig.botId || '8803814277');
+  const [chatId, setChatId] = useState(telegramConfig.chatId || '-1004292171419');
+  const [groupId, setGroupId] = useState(telegramConfig.groupId || '-1004292171419');
   const [telegramEnabled, setTelegramEnabled] = useState(telegramConfig.enabled ?? true);
   const [notifyOnSave, setNotifyOnSave] = useState(telegramConfig.notifyOnSave ?? true);
   const [notifyOnDispense, setNotifyOnDispense] = useState(telegramConfig.notifyOnDispense ?? true);
@@ -84,10 +84,10 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setBotToken(telegramConfig.botToken || '8939804029:AAHbGhUHnaPyAjRG8bzLpGRagstrZXpi2UQ');
-      setBotId(telegramConfig.botId || '8739503406');
-      setChatId(telegramConfig.chatId || '-5583489864');
-      setGroupId(telegramConfig.groupId || '-5583489864');
+      setBotToken(telegramConfig.botToken || '8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y');
+      setBotId(telegramConfig.botId || '8803814277');
+      setChatId(telegramConfig.chatId || '-1004292171419');
+      setGroupId(telegramConfig.groupId || '-1004292171419');
       setTelegramEnabled(telegramConfig.enabled ?? true);
       setNotifyOnSave(telegramConfig.notifyOnSave ?? true);
       setNotifyOnDispense(telegramConfig.notifyOnDispense ?? true);
@@ -178,7 +178,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
       if (res.sentCount > 0) {
         setStatusMessage({
           success: true,
-          text: `ส่งรายงานสถานะยาที่มีปัญหา ${res.sentCount} รายการ เข้า Telegram (แชทส่วนตัว และกลุ่ม ${groupId}) สำเร็จแล้ว!`,
+          text: `ส่งรายงานสถานะยาที่มีปัญหา ${res.sentCount} รายการ เข้ากลุ่ม Telegram (${groupId || '-1004292171419'}) สำเร็จแล้ว!`,
         });
       } else {
         setStatusMessage({ success: true, text: 'คลังยาปกติ ไม่มีรายการที่ต้องแจ้งเตือน (ทุกรายการปลอดภัย)' });
@@ -682,8 +682,8 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                     </span>
                   </h4>
                   <p className="text-xs text-sky-800 mt-0.5">
-                    แชทปลายทาง: กลุ่ม <code>{groupId || '-5583489864'}</code>
-                    {chatId && chatId !== groupId && <span> | แชทสำรอง <code>{chatId}</code></span>}
+                    แชทปลายทาง: กลุ่ม <code>{groupId || '-1004292171419'}</code>
+                    <span className="ml-1 text-emerald-700 font-semibold">(แจ้งเตือนผ่านกลุ่มนี้เท่านั้น)</span>
                   </p>
                 </div>
               </div>
@@ -718,11 +718,11 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
               <span className="text-base leading-none">⚡</span>
               <div className="space-y-0.5">
                 <div className="font-bold font-['Prompt'] text-emerald-900 flex items-center gap-2">
-                  <span>ระบบแจ้งเตือนอัตโนมัติเข้ากลุ่ม Telegram (-5583489864) ทำงานอยู่แล้ว</span>
+                  <span>ระบบแจ้งเตือนอัตโนมัติเข้ากลุ่ม Telegram (-1004292171419) เท่านั้น</span>
                   <span className="bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-sans">Active</span>
                 </div>
                 <p className="text-[11px] text-emerald-800 leading-relaxed">
-                  เมื่อมีการเปลี่ยนแปลงสถานะยา (หมดอายุ, ใกล้หมดอายุ, สต็อกถึงเกณฑ์ min) ไม่ว่าจะแก้ไข/ตัดยอดจากบนเว็บ หรือแก้ไขข้อมูลใน Google Sheet ระบบจะส่งแจ้งเตือนเข้ากลุ่ม <code>{groupId || '-5583489864'}</code> อัตโนมัติทันที โดยไม่จำเป็นต้องกดปุ่มส่งรายงานด้วยตนเอง
+                  เมื่อมีการเปลี่ยนแปลงสถานะยา (หมดอายุ, ใกล้หมดอายุ, สต็อกถึงเกณฑ์ min) ไม่ว่าจะแก้ไข/ตัดยอดจากบนเว็บ หรือแก้ไขข้อมูลใน Google Sheet ระบบจะส่งแจ้งเตือนเข้ากลุ่ม <code>{groupId || '-1004292171419'}</code> อัตโนมัติทันที โดยไม่จำเป็นต้องกดปุ่มส่งรายงานด้วยตนเอง
                 </p>
               </div>
             </div>
@@ -745,7 +745,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                     value={botToken}
                     onChange={(e) => setBotToken(e.target.value)}
                     className="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 bg-white"
-                    placeholder="เช่น 8939804029:AAHbGhUHnaPyAjRG8bzLpGRagstrZXpi2UQ"
+                    placeholder="เช่น 8803814277:AAH1ezF8t9Hf1m8SOtYUcIOFYiWPFec711Y"
                   />
                 </div>
 
@@ -758,7 +758,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                     value={botId}
                     onChange={(e) => setBotId(e.target.value)}
                     className="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 bg-white"
-                    placeholder="เช่น 8739503406"
+                    placeholder="เช่น 8803814277"
                   />
                 </div>
               </div>
@@ -767,36 +767,39 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
-                    <span>Telegram Group ID (กลุ่มงาน - ปลายทางหลัก)</span>
+                    <span>Telegram Group ID (กลุ่มงาน - แจ้งเตือนเฉพาะกลุ่มนี้เท่านั้น)</span>
                     <span className="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
-                      เป้าหมายหลัก
+                      ปลายทางหลัก
                     </span>
                   </label>
                   <input
                     type="text"
                     value={groupId}
-                    onChange={(e) => setGroupId(e.target.value)}
+                    onChange={(e) => {
+                      setGroupId(e.target.value);
+                      setChatId(e.target.value);
+                    }}
                     className="w-full px-3 py-2 text-xs font-mono border border-sky-400 bg-sky-50/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 font-bold text-sky-950"
-                    placeholder="เช่น -5583489864"
+                    placeholder="เช่น -1004292171419"
                   />
                   <p className="text-[11px] text-emerald-800 font-medium mt-1">
-                    ✅ แจ้งเตือนเข้ากลุ่มนี้โดยตรง (Group ID: {groupId || '-5583489864'})
+                    ✅ แจ้งเตือนเข้ากลุ่มนี้โดยตรงเท่านั้น (Group ID: {groupId || '-1004292171419'})
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Telegram Chat ID (แชทเพิ่มเติม)
+                    Telegram Chat ID
                   </label>
                   <input
                     type="text"
                     value={chatId}
                     onChange={(e) => setChatId(e.target.value)}
                     className="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600 bg-white"
-                    placeholder="เช่น -5583489864"
+                    placeholder="เช่น -1004292171419"
                   />
                   <p className="text-[11px] text-slate-600 mt-1">
-                    ไอดีสำหรับรับการแจ้งเตือนเพิ่มเติม (ถ้ามี)
+                    ไอดีกลุ่มสำหรับรับการแจ้งเตือน ({groupId || '-1004292171419'})
                   </p>
                 </div>
               </div>
@@ -826,7 +829,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                     className="rounded text-sky-600 focus:ring-sky-500"
                   />
                   <span className="font-medium text-emerald-900">
-                    ส่งแจ้งเตือนเข้า <strong>กลุ่ม Telegram (Group ID: {groupId || '-5583489864'})</strong> ด้วย
+                    ส่งแจ้งเตือนเข้า <strong>กลุ่ม Telegram (Group ID: {groupId || '-1004292171419'}) เท่านั้น</strong>
                   </span>
                 </label>
 
@@ -881,7 +884,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                 🔄 การเชื่อมต่อแบบ 2 ทาง (Web ➡️ Sheet ➡️ Telegram):
               </span>
               <ul className="list-disc list-inside text-sky-900 text-[11px] sm:text-xs space-y-1 pl-1">
-                <li><strong>เมื่อกรอกข้อมูลบนเว็บ:</strong> ข้อมูลจะถูกบันทึกและส่งเข้า Google Sheet อัตโนมัติ พร้อมส่งข้อความแจ้งเตือนเข้ากลุ่ม Telegram (Group ID: {groupId || '-5583489864'}) ทันที</li>
+                <li><strong>เมื่อกรอกข้อมูลบนเว็บ:</strong> ข้อมูลจะถูกบันทึกและส่งเข้า Google Sheet อัตโนมัติ พร้อมส่งข้อความแจ้งเตือนเข้ากลุ่ม Telegram (Group ID: {groupId || '-1004292171419'}) ทันที</li>
                 <li><strong>เมื่อแก้ไขใน Google Sheet:</strong> ในไฟล์ <code>Code.gs</code> มีฟังก์ชัน <code>checkInventoryAndNotifyTelegram()</code> ตรวจจับการเปลี่ยนแปลงของคอลัมน์สถานะ (ยกเว้นสถานะ "ปลอดภัย") แล้วส่งเข้ากลุ่ม Telegram อัตโนมัติ</li>
                 <li><strong>การตั้งเวลาอัตโนมัติ:</strong> ใน Apps Script สามารถรันฟังก์ชัน <code>createTelegramTrigger()</code> เพื่อให้ระบบตรวจเช็คและแจ้งเตือนเข้า Telegram ทุก 1 ชั่วโมงได้</li>
               </ul>
@@ -951,7 +954,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                   1. ในหน้าต่าง Google Apps Script ด้านบน มองหาแถบเลือกฟังก์ชัน (Dropdown Function)<br />
                   2. เลือกฟังก์ชันชื่อ <strong>installAllTriggers</strong> (หรือ <code>createTelegramTrigger</code>)<br />
                   3. กดปุ่ม <strong>"เรียกใช้" (Run) ▶️</strong> หนึ่งครั้ง และกดให้สิทธิ์การเข้าถึง (Review Permissions &gt; Allow)<br />
-                  4. เรียบร้อย! ระบบจะตรวจจับการเปลี่ยนแปลงใน Google Sheet (เมื่อพิมพ์แก้ไขข้อมูลหรือสถานะยาเปลี่ยน) และส่งแจ้งเตือนเข้ากลุ่ม Telegram <strong>(-5583489864)</strong> อัตโนมัติทันที
+                  4. เรียบร้อย! ระบบจะตรวจจับการเปลี่ยนแปลงใน Google Sheet (เมื่อพิมพ์แก้ไขข้อมูลหรือสถานะยาเปลี่ยน) และส่งแจ้งเตือนเข้ากลุ่ม Telegram <strong>(-1004292171419)</strong> อัตโนมัติทันที
                 </p>
               </div>
 
