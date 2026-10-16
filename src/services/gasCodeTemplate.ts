@@ -178,7 +178,7 @@ function writeAllDrugs(items) {
     if (daysLeft < 0) {
       expStatus = '🚨 หมดอายุแล้ว (' + Math.abs(daysLeft) + ' วันก่อน)';
       simpleStatus = '🚨 หมดอายุ';
-    } else if (daysLeft <= 90) {
+    } else if (daysLeft <= 180) {
       expStatus = '⏳ ใกล้หมดอายุ (' + daysLeft + ' วัน)';
       simpleStatus = '⏳ ใกล้หมดอายุ';
     }
@@ -300,25 +300,44 @@ function checkInventoryAndNotifyTelegram() {
     const days = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
 
     if (days < 0) {
-      alerts.push("🚨 [หมดอายุแล้ว] " + d.name + " (Lot: " + d.lot + ") คลัง: " + d.subWarehouse);
-    } else if (days <= 90) {
-      alerts.push("⏳ [ใกล้หมดอายุ " + days + " วัน] " + d.name + " (Lot: " + d.lot + ") คลัง: " + d.subWarehouse);
-    } else if (d.quantity <= d.min) {
-      alerts.push("📉 [สต็อกถึงเกณฑ์ Min] " + d.name + " เหลือ " + d.quantity + " " + d.unit + " (Min: " + d.min + ")");
+      alerts.push("🚨 [หมดอายุแล้ว (" + Math.abs(days) + " วัน)] " + d.name + " (Lot: " + d.lot + ") คลัง: " + d.subWarehouse + " คงเหลือ: " + d.quantity + " " + d.unit);
+    } else if (days <= 180) {
+      alerts.push("⏳ [ใกล้หมดอายุ " + days + " วัน] " + d.name + " (Lot: " + d.lot + ") คลัง: " + d.subWarehouse + " คงเหลือ: " + d.quantity + " " + d.unit);
     }
   });
 
   if (alerts.length > 0) {
-    const text = "🏥 แจ้งเตือนสถานะคลังยานอก รพ.เขาชัยสน\\nพบ " + alerts.length + " รายการที่ต้องตรวจสอบ:\\n\\n" + alerts.slice(0, 10).join("\\n");
-    UrlFetchApp.fetch("https://api.telegram.org/bot" + CONFIG.TELEGRAM_BOT_TOKEN + "/sendMessage", {
-      method: "post",
-      contentType: "application/json",
-      payload: JSON.stringify({
-        chat_id: CONFIG.TELEGRAM_CHAT_ID,
-        text: text
-      }),
-      muteHttpExceptions: true
-    });
+    const batchSize = 20;
+    const totalBatches = Math.ceil(alerts.length / batchSize);
+    for (var b = 0; b < totalBatches; b++) {
+      var start = b * batchSize;
+      var batch = alerts.slice(start, start + batchSize);
+      var header = "";
+      if (totalBatches === 1) {
+        header = "🏥 แจ้งเตือนสถานะคลังยานอก รพ.เขาชัยสน\\nพบ " + alerts.length + " รายการที่ต้องตรวจสอบ:\\n\\n";
+      } else {
+        header = "🏥 แจ้งเตือนสถานะคลังยานอก รพ.เขาชัยสน (ตอนที่ " + (b + 1) + "/" + totalBatches + ")\\nพบทั้งหมด " + alerts.length + " รายการ (แสดงรายการที่ " + (start + 1) + " - " + (start + batch.length) + "):\\n\\n";
+      }
+      var footer = "\\n\\n🕒 " + Utilities.formatDate(new Date(), "GMT+7", "HH:mm:ss") + " น.";
+      if (b === totalBatches - 1 && totalBatches > 1) {
+        footer = "\\n\\n✅ ส่งรายงานครบถ้วนทั้งหมด " + alerts.length + " รายการ" + footer;
+      }
+      var text = header + batch.join("\\n\\n") + footer;
+
+      UrlFetchApp.fetch("https://api.telegram.org/bot" + CONFIG.TELEGRAM_BOT_TOKEN + "/sendMessage", {
+        method: "post",
+        contentType: "application/json",
+        payload: JSON.stringify({
+          chat_id: CONFIG.TELEGRAM_CHAT_ID,
+          text: text
+        }),
+        muteHttpExceptions: true
+      });
+
+      if (b < totalBatches - 1) {
+        Utilities.sleep(400);
+      }
+    }
   }
 }
 

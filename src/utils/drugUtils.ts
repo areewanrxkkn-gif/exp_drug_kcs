@@ -11,13 +11,15 @@ export function calculateDaysLeft(expiryDateStr: string): number {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
+export const NEAR_EXPIRY_DAYS = 180;
+
 export function getDrugStatus(drug: DrugItem): DrugStatusResult {
   const daysLeft = calculateDaysLeft(drug.expiryDate);
   let expiryStatus: 'expired' | 'near_expiry' | 'safe' = 'safe';
 
   if (daysLeft < 0) {
     expiryStatus = 'expired';
-  } else if (daysLeft <= 90) {
+  } else if (daysLeft <= NEAR_EXPIRY_DAYS) {
     expiryStatus = 'near_expiry';
   } else {
     expiryStatus = 'safe';
@@ -87,7 +89,7 @@ export function getDaysLeftBadge(daysLeft: number): {
       badgeClass: 'bg-rose-600 text-white',
       text: `หมดอายุ (${Math.abs(daysLeft)} วันก่อน)`,
     };
-  } else if (daysLeft <= 90) {
+  } else if (daysLeft <= NEAR_EXPIRY_DAYS) {
     return {
       borderClass: 'border-l-4 border-l-amber-500 bg-amber-50/20',
       badgeClass: 'bg-amber-500 text-slate-950 font-bold',

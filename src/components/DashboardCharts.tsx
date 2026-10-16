@@ -303,7 +303,7 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
               >
                 <div className="flex items-center space-x-2">
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-xs font-semibold text-amber-900">ใกล้หมดอายุ (≤ 90 วัน)</span>
+                  <span className="text-xs font-semibold text-amber-900">ใกล้หมดอายุ (≤ 180 วัน)</span>
                 </div>
                 <div className="text-right">
                   <span className="text-xs font-bold text-amber-700 font-mono">

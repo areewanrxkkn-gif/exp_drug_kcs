@@ -545,6 +545,9 @@ export default function App() {
 
     // ส่งสรุปการนำเข้าเข้า Telegram ทันที
     TelegramService.notifyImportSuccess(telegramConfig, addedCount, updatedCount).catch(() => {});
+
+    // ตรวจสอบและส่งแจ้งเตือนสถานะยา (หากมีรายการหมดอายุ/ใกล้หมด/ต่ำกว่า min ในชุดที่นำเข้าใหม่)
+    TelegramService.checkAndNotifyStatusChangesAutomatically(telegramConfig, finalDrugs).catch(() => {});
   };
 
   // Open Edit Modal
@@ -748,7 +751,7 @@ export default function App() {
             )}
           </div>
           <div className="text-[11px] text-emerald-400/80">
-            ระบบติดตามวันหมดอายุ 90 วัน • จุดสั่งซื้อ Min/Max • อัปเดต Google Sheet อัตโนมัติพร้อมคอลัมน์สถานะยา
+            ระบบติดตามวันหมดอายุ 180 วัน • จุดสั่งซื้อ Min/Max • อัปเดต Google Sheet อัตโนมัติพร้อมคอลัมน์สถานะยา
           </div>
         </div>
       </footer>

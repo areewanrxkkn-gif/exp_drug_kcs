@@ -92,7 +92,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
               </h4>
               <p className="text-xs text-slate-600 mt-0.5">
                 {expiredCount > 0 && <span className="text-rose-600 font-semibold mr-2">• หมดอายุแล้ว {expiredCount} รายการ</span>}
-                {nearExpiryCount > 0 && <span className="text-amber-700 font-semibold mr-2">• ใกล้หมดอายุ (≤ 90 วัน) {nearExpiryCount} รายการ</span>}
+                {nearExpiryCount > 0 && <span className="text-amber-700 font-semibold mr-2">• ใกล้หมดอายุ (≤ 180 วัน) {nearExpiryCount} รายการ</span>}
                 {lowStockCount > 0 && <span className="text-orange-700 font-semibold">• สต็อกต่ำกว่า Min {lowStockCount} รายการ</span>}
               </p>
             </div>
@@ -177,7 +177,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className={`text-xs font-medium ${activeFilter === 'near_expiry' ? 'text-amber-200' : 'text-amber-800'}`}>
-              ใกล้หมดอายุ (≤ 90 วัน)
+              ใกล้หมดอายุ (≤ 180 วัน)
             </span>
             <div className={`p-2 rounded-lg ${activeFilter === 'near_expiry' ? 'bg-amber-800 text-amber-200' : 'bg-amber-100 text-amber-800'}`}>
               <Clock className="w-4 h-4" />

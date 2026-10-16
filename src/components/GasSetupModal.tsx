@@ -176,9 +176,10 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
         drugs
       );
       if (res.sentCount > 0) {
+        const batchInfo = res.messageCount > 1 ? ` (แบ่งส่งทั้งหมด ${res.messageCount} ข้อความต่อเนื่อง)` : '';
         setStatusMessage({
           success: true,
-          text: `ส่งรายงานสถานะยาที่มีปัญหา ${res.sentCount} รายการ เข้ากลุ่ม Telegram (${groupId || '-1004292171419'}) สำเร็จแล้ว!`,
+          text: `ส่งรายงานสถานะยาที่มีปัญหาครบทั้งหมด ${res.sentCount} รายการ${batchInfo} เข้ากลุ่ม Telegram (${groupId || '-1004292171419'}) สำเร็จแล้ว!`,
         });
       } else {
         setStatusMessage({ success: true, text: 'คลังยาปกติ ไม่มีรายการที่ต้องแจ้งเตือน (ทุกรายการปลอดภัย)' });
@@ -705,7 +706,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                   onClick={handleSendTelegramStatusReport}
                   disabled={isSendingStatusReport}
                   className="px-3.5 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                  title="ส่งสรุปยาใกล้หมดอายุ/หมดอายุ/ต่ำกว่า Min ทั้งหมดเข้า Telegram ทันที (ทางเลือกเมื่อต้องการดูสรุปทันที)"
+                  title="ส่งสรุปยาใกล้หมดอายุ (≤ 180 วัน) และหมดอายุทั้งหมดเข้า Telegram ทันที (ทางเลือกเมื่อต้องการดูสรุปทันที)"
                 >
                   {isSendingStatusReport ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bell className="w-4 h-4 text-emerald-300" />}
                   <span>{isSendingStatusReport ? 'กำลังส่ง...' : 'ส่งสรุปรายงานสถานะทันที (ทางเลือก)'}</span>
@@ -722,7 +723,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                   <span className="bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-sans">Active</span>
                 </div>
                 <p className="text-[11px] text-emerald-800 leading-relaxed">
-                  เมื่อมีการเปลี่ยนแปลงสถานะยา (หมดอายุ, ใกล้หมดอายุ, สต็อกถึงเกณฑ์ min) ไม่ว่าจะแก้ไข/ตัดยอดจากบนเว็บ หรือแก้ไขข้อมูลใน Google Sheet ระบบจะส่งแจ้งเตือนเข้ากลุ่ม <code>{groupId || '-1004292171419'}</code> อัตโนมัติทันที โดยไม่จำเป็นต้องกดปุ่มส่งรายงานด้วยตนเอง
+                  เมื่อตรวจพบรายการยาหมดอายุ หรือใกล้หมดอายุ (เกณฑ์ ≤ 180 วัน) ไม่ว่าจะแก้ไข/ตัดยอดจากบนเว็บ หรือแก้ไขข้อมูลใน Google Sheet ระบบจะส่งแจ้งเตือนเข้ากลุ่ม <code>{groupId || '-1004292171419'}</code> อัตโนมัติทันที
                 </p>
               </div>
             </div>
@@ -863,7 +864,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                     disabled={!telegramEnabled}
                     className="rounded text-sky-600 focus:ring-sky-500"
                   />
-                  <span>แจ้งเตือนเมื่อ <strong>สถานะยาเปลี่ยน (หมดอายุ, ใกล้หมดอายุ, สต็อกถึงเกณฑ์ min)</strong></span>
+                  <span>แจ้งเตือนเมื่อ <strong>สถานะยาเปลี่ยน (หมดอายุ, ใกล้หมดอายุ ≤ 180 วัน)</strong></span>
                 </label>
               </div>
 
@@ -968,7 +969,7 @@ export const GasSetupModal: React.FC<GasSetupModalProps> = ({
                 <div className="space-y-1.5 font-mono text-[11px] bg-slate-100 p-2.5 rounded-lg border border-slate-300">
                   <div>
                     <span className="font-bold text-emerald-800">คอลัมน์ I (สถานะวันหมดอายุ):</span><br />
-                    <code>=IF(H2="","-", IF(H2&lt;TODAY(),"🚨 หมดอายุแล้ว", IF(H2-TODAY()&lt;=90,"⏳ ใกล้หมดอายุ ("&amp;(H2-TODAY())&amp;" วัน)","✅ ปลอดภัย ("&amp;(H2-TODAY())&amp;" วัน)")) )</code>
+                    <code>=IF(H2="","-", IF(H2&lt;TODAY(),"🚨 หมดอายุแล้ว", IF(H2-TODAY()&lt;=180,"⏳ ใกล้หมดอายุ ("&amp;(H2-TODAY())&amp;" วัน)","✅ ปลอดภัย ("&amp;(H2-TODAY())&amp;" วัน)")) )</code>
                   </div>
                   <div className="pt-1 border-t border-slate-200">
                     <span className="font-bold text-teal-800">คอลัมน์ N (สถานะสต็อก Min):</span><br />
